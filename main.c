@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    screen = SDL_SetVideoMode(LARGEUR_FENETRE, HAUTEUR_FENETRE, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+    screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     SDL_WM_SetCaption("Bomberman", NULL);
 
     menu = IMG_Load(MENU_PATH);
@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
         SDL_Flip(screen);
     }
     SDL_FreeSurface(menu);
+    SDL_FreeSurface(screen);
     SDL_Quit();
 
     return EXIT_SUCCESS;

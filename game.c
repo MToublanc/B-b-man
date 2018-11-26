@@ -1,43 +1,20 @@
 #include "constants.h"
 #include "game.h"
+#include "bomb.h"
+#include "character.h"
+#include "map.h"
 
 void game(SDL_Surface* screen)
 {
-    SDL_Surface *bomberman[4] = {NULL};
-    SDL_Surface *explodable_block = NULL, *empty = NULL, *solid_block = NULL, *currentBMan = NULL;
-    SDL_Rect position, playerPosition;
     SDL_Event event;
-
     int playing = 1, i = 0, j = 0;
-    int map[NB_BLOCK_WIDTH][NB_BLOCK_HEIGHT] = {
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2},
-        {2, 1, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 1, 2},
-        {2, 0, 2, 1, 0, 1, 1, 1, 1, 0, 1, 2, 0, 2},
-        {2, 1, 2, 0, 2, 2, 2, 2, 2, 2, 0, 2, 1, 2},
-        {2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1, 2},
-        {2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 2},
-        {2, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2},
-        {2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1, 2},
-        {2, 1, 2, 0, 2, 2, 2, 2, 2, 2, 0, 2, 1, 2},
-        {2, 0, 2, 1, 0, 1, 1, 1, 1, 0, 1, 2, 0, 2},
-        {2, 1, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 1, 2},
-        {2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
-        };
+    int **map = load_map();
 
-    explodable_block = IMG_Load("assets/sprites/explodable-block.png");
-    empty = IMG_Load("assets/sprites/empty.png");
-    solid_block = IMG_Load("assets/sprites/solid-block.png");
-    bomberman[DOWN] = IMG_Load("assets/sprites/bman-front.png");
-    bomberman[LEFT] = IMG_Load("assets/sprites/bman-left.png");
-    bomberman[UP] = IMG_Load("assets/sprites/bman-back.png");
-    bomberman[RIGHT] = IMG_Load("assets/sprites/bman-right.png");
+    t_bomb_node *bomb_list = NULL;
+    t_character *character = create_character(4, 1);
 
-    currentBMan = bomberman[DOWN];
-
-    playerPosition.x = 4;
-    playerPosition.y = 1;
+    if (!map)
+        exit(EXIT_FAILURE);
 
     while (playing)
     {
@@ -54,86 +31,30 @@ void game(SDL_Surface* screen)
                         playing = 0;
                         break;
                     case SDLK_UP:
-                        currentBMan = bomberman[UP];
-                        moveCharacter(map, &playerPosition, UP);
+                        moveCharacter(map, character, bomb_list, UP);
                         break;
                     case SDLK_DOWN:
-                        currentBMan = bomberman[DOWN];
-                        moveCharacter(map, &playerPosition, DOWN);
+                        moveCharacter(map, character, bomb_list, DOWN);
                         break;
                     case SDLK_RIGHT:
-                        currentBMan = bomberman[RIGHT];
-                        moveCharacter(map, &playerPosition, RIGHT);
+                        moveCharacter(map, character, bomb_list, RIGHT);
                         break;
                     case SDLK_LEFT:
-                        currentBMan = bomberman[LEFT];
-                        moveCharacter(map, &playerPosition, LEFT);
+                        moveCharacter(map, character, bomb_list, LEFT);
+                        break;
+                    case SDLK_SPACE:
+                        bomb_list = add_bomb_to_list(bomb_list, character->x, character->y);
                         break;
                 }
                 break;
         }
 
-        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 255, 255, 255));
-
-        for (i = 0 ; i < NB_BLOCK_WIDTH ; i++)
-        {
-            for (j = 0 ; j < NB_BLOCK_HEIGHT ; j++)
-            {
-                position.x = j * BLOCK_SIZE;
-                position.y = i * BLOCK_SIZE;
-
-                switch(map[i][j])
-                {
-                    case EXPLODABLE_BLOCK:
-                        SDL_BlitSurface(explodable_block, NULL, screen, &position);
-                        break;
-                    case EMPTY:
-                        SDL_BlitSurface(empty, NULL, screen, &position);
-                        break;
-                    case SOLID_BLOCK:
-                        SDL_BlitSurface(solid_block, NULL, screen, &position);
-                        break;
-                }
-            }
-        }
-        position.x = playerPosition.x * BLOCK_SIZE;
-        position.y = playerPosition.y * BLOCK_SIZE - BLOCK_SIZE;
-        SDL_BlitSurface(currentBMan, NULL, screen, &position);
+        draw_map(map, screen);
+        draw_bombs_on_screen(screen, bomb_list);
+        SDL_BlitSurface(character->surface[character->current_direction], NULL, screen, &character->screen_position);
         SDL_Flip(screen);
     }
     for (i = 0 ; i < 4 ; i++)
-        SDL_FreeSurface(bomberman[i]);
-    SDL_FreeSurface(explodable_block);
-    SDL_FreeSurface(empty);
-    SDL_FreeSurface(solid_block);
-}
-
-void moveCharacter(int map[][NB_BLOCK_HEIGHT], SDL_Rect *pos, int direction)
-{
-    switch(direction)
-    {
-        case UP:
-            if ((pos->y - 1 < 0) || (map[pos->y - 1][pos->x] != EMPTY))
-                break;
-            pos->y--;
-            break;
-
-        case DOWN:
-            if ((pos->y + 1 >= NB_BLOCK_HEIGHT) || (map[pos->y + 1][pos->x] != EMPTY))
-                break;
-            pos->y++;
-            break;
-
-        case LEFT:
-            if ((pos->x - 1 < 0) || (map[pos->y][pos->x - 1] != EMPTY))
-                break;
-            pos->x--;
-            break;
-
-        case RIGHT:
-            if ((pos->x + 1 >= NB_BLOCK_WIDTH) || (map[pos->y][pos->x + 1] != EMPTY))
-                break;
-            pos->x++;
-            break;
-    }
+        SDL_FreeSurface(character->surface[i]);
+    free_map(map);
 }

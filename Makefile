@@ -1,11 +1,14 @@
 CC := gcc
 
-CFLAGS := -lSDL -lSDL_image -lSDL_ttf
+CFLAGS := -lSDL -lSDL_image -lSDL_ttf -w -Wall -Wextra -Werror
 
 HDRS :=
 
 SRCS :=	main.c		\
-		game.c
+		game.c		\
+		bomb.c		\
+		character.c	\
+		map.c
 
 OBJS := $(SRCS:.c=.o)
 
