@@ -4,7 +4,7 @@
 #include "character.h"
 #include "map.h"
 
-void game(SDL_Surface* screen)
+void game(SDL_Surface *screen)
 {
     SDL_Event event;
     int playing = 1, i = 0, j = 0;
@@ -18,40 +18,46 @@ void game(SDL_Surface* screen)
 
     while (playing)
     {
-        SDL_WaitEvent(&event);
-        switch(event.type)
+        while (SDL_PollEvent(&event))
         {
-            case SDL_QUIT:
-                playing = 0;
-                break;
-            case SDL_KEYDOWN:
-                switch(event.key.keysym.sym)
-                {
-                    case SDLK_ESCAPE:
-                        playing = 0;
-                        break;
-                    case SDLK_UP:
-                        moveCharacter(map, character, bomb_list, UP);
-                        break;
-                    case SDLK_DOWN:
-                        moveCharacter(map, character, bomb_list, DOWN);
-                        break;
-                    case SDLK_RIGHT:
-                        moveCharacter(map, character, bomb_list, RIGHT);
-                        break;
-                    case SDLK_LEFT:
-                        moveCharacter(map, character, bomb_list, LEFT);
-                        break;
-                    case SDLK_SPACE:
-                        bomb_list = add_bomb_to_list(bomb_list, character->x, character->y);
-                        break;
-                }
-                break;
+            switch(event.type)
+            {
+                case SDL_QUIT:
+                    playing = 0;
+                    break;
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym)
+                    {
+                        case SDLK_ESCAPE:
+                            playing = 0;
+                            break;
+                        case SDLK_UP:
+                            moveCharacter(map, character, bomb_list, UP);
+                            break;
+                        case SDLK_DOWN:
+                            moveCharacter(map, character, bomb_list, DOWN);
+                            break;
+                        case SDLK_RIGHT:
+                            moveCharacter(map, character, bomb_list, RIGHT);
+                            break;
+                        case SDLK_LEFT:
+                            moveCharacter(map, character, bomb_list, LEFT);
+                            break;
+                        case SDLK_SPACE:
+                            add_bomb_to_list(&bomb_list, character->x, character->y);
+                            break;
+                    }
+                    break;
+            }
         }
-
         draw_map(map, screen);
-        draw_bombs_on_screen(screen, bomb_list);
-        SDL_BlitSurface(character->surface[character->current_direction], NULL, screen, &character->screen_position);
+        draw_bombs_on_screen(screen, &bomb_list);
+        SDL_BlitSurface(
+            character->surface[character->current_direction],
+            NULL,
+            screen,
+            &character->screen_position
+        );
         SDL_Flip(screen);
     }
     for (i = 0 ; i < 4 ; i++)

@@ -8,7 +8,8 @@ SRCS :=	main.c		\
 		game.c		\
 		bomb.c		\
 		character.c	\
-		map.c
+		map.c		\
+		menu.c
 
 OBJS := $(SRCS:.c=.o)
 
