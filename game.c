@@ -52,12 +52,7 @@ void game(SDL_Surface *screen)
         }
         draw_map(map, screen);
         draw_bombs_on_screen(screen, &bomb_list, map);
-        SDL_BlitSurface(
-            character->surface[character->current_direction],
-            NULL,
-            screen,
-            &character->screen_position
-        );
+        draw_character_on_screen(screen, character, map);
         SDL_Flip(screen);
     }
     for (i = 0 ; i < 4 ; i++)
