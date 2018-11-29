@@ -51,7 +51,7 @@ void game(SDL_Surface *screen)
             }
         }
         draw_map(map, screen);
-        draw_bombs_on_screen(screen, &bomb_list);
+        draw_bombs_on_screen(screen, &bomb_list, map);
         SDL_BlitSurface(
             character->surface[character->current_direction],
             NULL,
