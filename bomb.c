@@ -74,7 +74,7 @@ int draw_explosion_on_screen(t_args *args)
 
     set_sprites_for_explosion(args, FLAMES);
 
-    while (1)
+    while (true)
     {
         currentTime = SDL_GetTicks();
         if ((currentTime - prevTime) > 500) {

@@ -28,5 +28,6 @@ int is_bomb_at_position(t_bomb_node* bomb_list, int x, int y);
 void remove_bomb_by_index(t_bomb_node **head, int n);
 void create_thread_args(int **map, t_bomb *bomb, t_args *args);
 int draw_explosion_on_screen(t_args *args);
+void set_sprites_for_explosion(t_args *args, int sprite);
 
 #endif

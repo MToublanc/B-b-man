@@ -12,6 +12,7 @@ t_character* create_character(int x, int y)
     character->x = x;
     character->y = y;
     character->current_direction = DOWN;
+    character->life = 1;
 	character->screen_position.x = character->x * BLOCK_SIZE;
 	character->screen_position.y = character->y * BLOCK_SIZE - BLOCK_SIZE;
     character->surface = malloc(sizeof(SDL_Surface*) * 4);
@@ -21,6 +22,29 @@ t_character* create_character(int x, int y)
     character->surface[RIGHT] = IMG_Load("assets/sprites/bman-right.png");
 
 	return character;
+}
+
+bool is_character_in_flames(t_character *character, int **map)
+{
+    if (map[character->y][character->x] == FLAMES)
+        return true;
+        
+    return false;
+}
+
+void draw_character_on_screen(SDL_Surface *screen, t_character *character, int **map)
+{
+    if (is_character_in_flames(character, map))
+        character->life = 0;
+
+    if (character->life > 0) {
+        SDL_BlitSurface(
+            character->surface[character->current_direction],
+            NULL,
+            screen,
+            &character->screen_position
+        );
+    }
 }
 
 void moveCharacter(int **map, t_character *character, t_bomb_node *bomb_list, int direction)
