@@ -5,6 +5,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_getenv.h>
+#include <SDL/SDL_mixer.h>
 
 #ifndef DEF_CONSTANTS
 #define DEF_CONSTANTS

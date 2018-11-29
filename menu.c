@@ -8,12 +8,19 @@ void menu()
     SDL_Event event;
 
     int playing = 1;
-
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     SDL_WM_SetCaption("Bomberman", NULL);
 
+    SDL_WM_SetCaption("SDL_Mixer", NULL);
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
+    {
+        printf("%s", Mix_GetError());
+    }
+    Mix_Music *musique;
+    musique = Mix_LoadMUS("assets/son/menu.mp3");
+    Mix_PlayMusic(musique, -1);
     menu = IMG_Load("assets/images/menu.png");
     positionMenu.x = 0;
     positionMenu.y = 0;
@@ -33,6 +40,7 @@ void menu()
                         playing = 0;
                         break;
                     case SDLK_j: // Join
+                        Mix_HaltMusic();
                         game(screen);
                         break;
                     case SDLK_h: // Host
@@ -51,4 +59,6 @@ void menu()
     SDL_FreeSurface(menu);
     SDL_FreeSurface(screen);
     SDL_Quit();
+    Mix_FreeMusic(musique);
+    Mix_CloseAudio();
 }
