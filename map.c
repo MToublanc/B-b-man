@@ -65,11 +65,12 @@ void draw_map(int **map, SDL_Surface *screen)
 {
     int i, j;
     SDL_Rect position;
-    SDL_Surface *explodable_block = NULL, *empty = NULL, *solid_block = NULL;
+    SDL_Surface *explodable_block = NULL, *empty = NULL, *solid_block = NULL, *flames = NULL;
 
     explodable_block = IMG_Load("assets/sprites/explodable-block.png");
     empty = IMG_Load("assets/sprites/empty.png");
     solid_block = IMG_Load("assets/sprites/solid-block.png");
+    flames = IMG_Load("assets/sprites/flame.png");
 
     for (i = 0 ; i < NB_BLOCK_WIDTH ; i++)
     {
@@ -88,6 +89,9 @@ void draw_map(int **map, SDL_Surface *screen)
                     break;
                 case SOLID_BLOCK:
                     SDL_BlitSurface(solid_block, NULL, screen, &position);
+                    break;
+                case FLAMES:
+                    SDL_BlitSurface(flames, NULL, screen, &position);
                     break;
             }
         }
