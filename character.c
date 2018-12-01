@@ -24,6 +24,16 @@ t_character* create_character(int x, int y)
 	return character;
 }
 
+void add_character_to_list(t_character **character_list, int x, int y)
+{
+    t_character_node *new_node = malloc(sizeof(*new_node));
+    t_character *new_character = create_character(x, y);
+
+	new_node->character = new_character;
+	new_node->next = *character_list;
+	*character_list = new_node;
+}
+
 bool is_character_in_flames(t_character *character, int **map)
 {
     if (map[character->y][character->x] == FLAMES)
@@ -32,18 +42,49 @@ bool is_character_in_flames(t_character *character, int **map)
     return false;
 }
 
-void draw_character_on_screen(SDL_Surface *screen, t_character *character, int **map)
-{
-    if (is_character_in_flames(character, map))
-        character->life = 0;
+void remove_character_by_index(t_character_node **head, int n) {
+    int i = 0;
+    t_character_node *current = (*head);
+    t_character_node *node_to_remove = NULL;
 
-    if (character->life > 0) {
-        SDL_BlitSurface(
-            character->surface[character->current_direction],
-            NULL,
-            screen,
-            &character->screen_position
-        );
+    if (n == 0) {
+        free(*head);
+        *head = NULL;
+        return NULL;
+    }
+
+    for (i = 0; i < n - 1; i++)
+        current = current->next;
+
+    node_to_remove = current->next;
+    current->next = node_to_remove->next;
+    free(node_to_remove);
+}
+
+void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character_list, int **map)
+{
+    int i = 0;
+    t_character_node *current = *character_list;
+
+    while (current != NULL)
+    {
+        if (is_character_in_flames(current->character, map))
+            current->character->life = 0;
+        
+        if (current->character->life > 0)
+        {
+            SDL_BlitSurface(
+                current->character->surface[current->character->current_direction],
+                NULL,
+                screen,
+                &current->character->screen_position
+            );
+
+        } else {
+            remove_character_by_index(character_list, i);
+        }
+        current = current->next;
+        i++;
     }
 }
 

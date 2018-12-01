@@ -3,17 +3,23 @@
 
 #include "bomb.h"
 
-typedef struct          s_character {
-    int                 x;
-    int                 y;
-    int                 current_direction;
-    int                 life;
-    SDL_Rect            screen_position;
-    SDL_Surface         **surface;
-}                       t_character;
+typedef struct              s_character {
+    int                     x;
+    int                     y;
+    int                     current_direction;
+    int                     life;
+    SDL_Rect                screen_position;
+    SDL_Surface             **surface;
+}                           t_character;
+
+typedef struct              s_character_node {
+    t_character             *character;
+    struct s_character_node *next;
+}                           t_character_node;
 
 t_character* create_character(int x, int y);
 void moveCharacter(int **map, t_character *character, t_bomb_node *bomb_list, int direction);
-void draw_character_on_screen(SDL_Surface *screen, t_character *character, int **map);
+void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character_list, int **map);
+void add_character_to_list(t_character **character_list, int x, int y);
 
 #endif
