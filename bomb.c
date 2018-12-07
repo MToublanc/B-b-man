@@ -4,7 +4,14 @@
 t_bomb* create_bomb(int x, int y)
 {
 	t_bomb *bomb = malloc(sizeof(*bomb));
-
+    SDL_WM_SetCaption("SDL_Mixer", NULL);
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
+    {
+        printf("%s", Mix_GetError());
+    }
+    Mix_Music *musique;
+    musique = Mix_LoadMUS("assets/son/drop_bomb.mp3");
+    Mix_PlayMusic(musique, 1);
 	if (!bomb)
 		error("Bomb create error");
 
@@ -16,6 +23,7 @@ t_bomb* create_bomb(int x, int y)
     bomb->surface = IMG_Load("assets/sprites/bomb.png");
 
 	return bomb;
+    Mix_FreeMusic(musique);
 }
 
 void add_bomb_to_list(t_bomb_node **bomb_list, int x, int y)
@@ -49,10 +57,11 @@ void remove_bomb_by_index(t_bomb_node **head, int n) {
 
 void draw_bombs_on_screen(SDL_Surface *screen, t_bomb_node **bomb_list)
 {    
+    
     int i = 0;
     t_bomb_node *current = *bomb_list;
     unsigned int currentTime = SDL_GetTicks();
-
+    
     while (current != NULL) {
         SDL_BlitSurface(current->bomb->surface, NULL, screen, &current->bomb->screen_position);
         if (currentTime - current->bomb->timer > 2000) {
