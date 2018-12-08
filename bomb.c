@@ -1,17 +1,23 @@
 #include "constants.h"
 #include "bomb.h"
+#include "character.h"
+
+void create_thread_args(int **map, t_bomb *bomb, t_args *args)
+{
+    args->map = map;
+    args->bomb = bomb;
+}
 
 t_bomb* create_bomb(int x, int y)
 {
 	t_bomb *bomb = malloc(sizeof(*bomb));
-    SDL_WM_SetCaption("SDL_Mixer", NULL);
+    Mix_Chunk *drop = NULL;
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
     {
         printf("%s", Mix_GetError());
     }
-    Mix_Music *musique;
-    musique = Mix_LoadMUS("assets/son/drop_bomb.mp3");
-    Mix_PlayMusic(musique, 1);
+    drop = Mix_LoadWAV( "assets/son/drop_bomb.wav" );
+    Mix_PlayChannel(-1, drop, 0);
 	if (!bomb)
 		error("Bomb create error");
 
@@ -21,9 +27,7 @@ t_bomb* create_bomb(int x, int y)
 	bomb->screen_position.x = bomb->x * BLOCK_SIZE;
 	bomb->screen_position.y = bomb->y * BLOCK_SIZE;
     bomb->surface = IMG_Load("assets/sprites/bomb.png");
-
 	return bomb;
-    Mix_FreeMusic(musique);
 }
 
 void add_bomb_to_list(t_bomb_node **bomb_list, int x, int y)
@@ -55,16 +59,60 @@ void remove_bomb_by_index(t_bomb_node **head, int n) {
     free(node_to_remove);
 }
 
-void draw_bombs_on_screen(SDL_Surface *screen, t_bomb_node **bomb_list)
-{    
+void set_sprites_for_explosion(t_args *args, int sprite)
+{
+    args->map[args->bomb->y][args->bomb->x] = sprite;
+    if (args->map[args->bomb->y - 1][args->bomb->x] != SOLID_BLOCK)
+        args->map[args->bomb->y - 1][args->bomb->x] = sprite;
+    if (args->map[args->bomb->y + 1][args->bomb->x] != SOLID_BLOCK)
+        args->map[args->bomb->y + 1][args->bomb->x] = sprite;
+    if (args->map[args->bomb->y][args->bomb->x + 1] != SOLID_BLOCK)
+        args->map[args->bomb->y][args->bomb->x + 1] = sprite;
+    if (args->map[args->bomb->y][args->bomb->x - 1] != SOLID_BLOCK)
+        args->map[args->bomb->y][args->bomb->x - 1] = sprite;
+}
+
+int draw_explosion_on_screen(t_args *args)
+{
     
+    int i = 0, j = 0;
+    unsigned int currentTime = 0, prevTime = SDL_GetTicks();
+     Mix_Chunk *explosion = NULL;
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
+    {
+        printf("%s", Mix_GetError());
+    }
+    explosion = Mix_LoadWAV( "assets/son/explosion_bomb.wav" );
+    set_sprites_for_explosion(args, FLAMES);
+
+    while (true)
+    {
+        currentTime = SDL_GetTicks();
+        if ((currentTime - prevTime) > 500) {
+            set_sprites_for_explosion(args, EMPTY);
+            Mix_PlayChannel(-1, explosion, 0);
+            free(args);
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void draw_bombs_on_screen(SDL_Surface *screen, t_bomb_node **bomb_list, int **map)
+{    
     int i = 0;
     t_bomb_node *current = *bomb_list;
     unsigned int currentTime = SDL_GetTicks();
-    
-    while (current != NULL) {
+    SDL_Thread *thread = NULL;
+    t_args *args = malloc(sizeof(*args));
+
+    while (current != NULL)
+    {
         SDL_BlitSurface(current->bomb->surface, NULL, screen, &current->bomb->screen_position);
         if (currentTime - current->bomb->timer > 2000) {
+            create_thread_args(map, current->bomb, args);
+            thread = SDL_CreateThread(draw_explosion_on_screen, args);
             remove_bomb_by_index(bomb_list, i);
         }
         current = current->next;

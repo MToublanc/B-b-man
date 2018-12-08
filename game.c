@@ -7,19 +7,24 @@
 void game(SDL_Surface *screen)
 {
     SDL_Event event;
-    int playing = 1, i = 0, j = 0;
+    bool playing = true;
+    int i = 0, j = 0;
     int **map = load_map();
 
     t_bomb_node *bomb_list = NULL;
-    t_character *character = create_character(4, 1);
-    SDL_WM_SetCaption("SDL_Mixer", NULL);
+    t_character_node *character_list = NULL; 
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
     {
         printf("%s", Mix_GetError());
     }
-    Mix_Music *musique;
-    musique = Mix_LoadMUS("assets/son/game.mp3");
-    Mix_PlayMusic(musique, -1);
+    Mix_Music *music;
+    Mix_Music *music_menu;
+    music_menu = Mix_LoadMUS("assets/son/menu.mp3");
+    music = Mix_LoadMUS("assets/son/game.mp3");
+    Mix_PlayMusic(music, -1);
+
+    add_character_to_list(&character_list, 4, 1);
+
     if (!map)
         exit(EXIT_FAILURE);
 
@@ -31,44 +36,44 @@ void game(SDL_Surface *screen)
             {
                 case SDL_QUIT:
                     playing = 0;
+                    Mix_PlayMusic(music_menu, -1);
                     break;
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
                         case SDLK_ESCAPE:
                             playing = 0;
+                            Mix_PlayMusic(music_menu, -1);
                             break;
                         case SDLK_UP:
-                            moveCharacter(map, character, bomb_list, UP);
+                            moveCharacter(map, character_list->character, bomb_list, UP);
                             break;
                         case SDLK_DOWN:
-                            moveCharacter(map, character, bomb_list, DOWN);
+                            moveCharacter(map, character_list->character, bomb_list, DOWN);
                             break;
                         case SDLK_RIGHT:
-                            moveCharacter(map, character, bomb_list, RIGHT);
+                            moveCharacter(map, character_list->character, bomb_list, RIGHT);
                             break;
                         case SDLK_LEFT:
-                            moveCharacter(map, character, bomb_list, LEFT);
+                            moveCharacter(map, character_list->character, bomb_list, LEFT);
                             break;
                         case SDLK_SPACE:
-                            add_bomb_to_list(&bomb_list, character->x, character->y);
+                            add_bomb_to_list(&bomb_list, character_list->character->x, character_list->character->y);
                             break;
                     }
                     break;
             }
         }
         draw_map(map, screen);
-        draw_bombs_on_screen(screen, &bomb_list);
-        SDL_BlitSurface(
-            character->surface[character->current_direction],
-            NULL,
-            screen,
-            &character->screen_position
-        );
+        draw_bombs_on_screen(screen, &bomb_list, map);
+        if (character_list != NULL) {
+            draw_characters_on_screen(screen, &character_list, map);
+        } else {
+            playing = false;
+        } 
         SDL_Flip(screen);
     }
-    for (i = 0 ; i < 4 ; i++)
-        SDL_FreeSurface(character->surface[i]);
+    SDL_Delay(500);
+    
     free_map(map);
-    Mix_FreeMusic(musique);
 }
