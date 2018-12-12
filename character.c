@@ -36,25 +36,15 @@ void add_character_to_list(t_character **character_list, int x, int y)
 
 bool is_character_in_flames(t_character *character, int **map)
 {
-    Mix_Chunk *game_over = NULL;
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
-    {
-        printf("%s", Mix_GetError());
-    }
-    Mix_Music *music;
-    music = Mix_LoadMUS("assets/son/menu.mp3");
-    game_over = Mix_LoadWAV( "assets/son/game_over.wav" );
     if (map[character->y][character->x] == FLAMES)
         return true;
-        //Mix_PlayChannel(0, game_over, 0);
         
     return false;
-    
+
 }
 
 void remove_character_by_index(t_character_node **head, int n) {
     int i = 0;
-    
     t_character_node *current = (*head);
     t_character_node *node_to_remove = NULL;
 
@@ -62,6 +52,7 @@ void remove_character_by_index(t_character_node **head, int n) {
         free(*head);
         *head = NULL;
         return NULL;
+         
     }
 
     for (i = 0; i < n - 1; i++)
@@ -76,7 +67,8 @@ void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character
 {
     int i = 0;
     t_character_node *current = *character_list;
-
+    Mix_Chunk *game_over = NULL;
+    game_over = Mix_LoadWAV("assets/son/game_over.wav");
     while (current != NULL)
     {
         if (is_character_in_flames(current->character, map))
@@ -92,6 +84,7 @@ void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character
             );
 
         } else {
+            Mix_PlayChannel(-1, game_over, 0);
             remove_character_by_index(character_list, i);
         }
         current = current->next;

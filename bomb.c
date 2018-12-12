@@ -12,12 +12,9 @@ t_bomb* create_bomb(int x, int y)
 {
 	t_bomb *bomb = malloc(sizeof(*bomb));
     Mix_Chunk *drop = NULL;
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
-    {
-        printf("%s", Mix_GetError());
-    }
+   
     drop = Mix_LoadWAV( "assets/son/drop_bomb.wav" );
-    Mix_PlayChannel(-1, drop, 0);
+    Mix_PlayChannel(1, drop, 0);
 	if (!bomb)
 		error("Bomb create error");
 
@@ -27,7 +24,9 @@ t_bomb* create_bomb(int x, int y)
 	bomb->screen_position.x = bomb->x * BLOCK_SIZE;
 	bomb->screen_position.y = bomb->y * BLOCK_SIZE;
     bomb->surface = IMG_Load("assets/sprites/bomb.png");
+
 	return bomb;
+    Mix_FreeChunk(drop);
 }
 
 void add_bomb_to_list(t_bomb_node **bomb_list, int x, int y)
@@ -74,14 +73,9 @@ void set_sprites_for_explosion(t_args *args, int sprite)
 
 int draw_explosion_on_screen(t_args *args)
 {
-    
     int i = 0, j = 0;
     unsigned int currentTime = 0, prevTime = SDL_GetTicks();
-     Mix_Chunk *explosion = NULL;
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
-    {
-        printf("%s", Mix_GetError());
-    }
+    Mix_Chunk *explosion = NULL;
     explosion = Mix_LoadWAV( "assets/son/explosion_bomb.wav" );
     set_sprites_for_explosion(args, FLAMES);
 
@@ -90,9 +84,10 @@ int draw_explosion_on_screen(t_args *args)
         currentTime = SDL_GetTicks();
         if ((currentTime - prevTime) > 500) {
             set_sprites_for_explosion(args, EMPTY);
-            Mix_PlayChannel(-1, explosion, 0);
             free(args);
+            Mix_PlayChannel(-1, explosion, 0);
             return 1;
+            Mix_FreeChunk(explosion);
         }
     }
 

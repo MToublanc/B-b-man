@@ -13,18 +13,9 @@ void game(SDL_Surface *screen)
 
     t_bomb_node *bomb_list = NULL;
     t_character_node *character_list = NULL; 
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
-    {
-        printf("%s", Mix_GetError());
-    }
-    Mix_Music *music;
-    Mix_Music *music_menu;
-    music_menu = Mix_LoadMUS("assets/son/menu.mp3");
-    music = Mix_LoadMUS("assets/son/game.mp3");
-    Mix_PlayMusic(music, -1);
-
+    Mix_Chunk *game_over = NULL;
+    game_over = Mix_LoadWAV("assets/son/game_over.wav");
     add_character_to_list(&character_list, 4, 1);
-
     if (!map)
         exit(EXIT_FAILURE);
 
@@ -32,18 +23,19 @@ void game(SDL_Surface *screen)
     {
         while (SDL_PollEvent(&event))
         {
+            
             switch(event.type)
             {
                 case SDL_QUIT:
                     playing = 0;
-                    Mix_PlayMusic(music_menu, -1);
                     break;
+                     
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
                         case SDLK_ESCAPE:
                             playing = 0;
-                            Mix_PlayMusic(music_menu, -1);
+                            Mix_PlayChannel(3, game_over, 0);
                             break;
                         case SDLK_UP:
                             moveCharacter(map, character_list->character, bomb_list, UP);
@@ -62,6 +54,7 @@ void game(SDL_Surface *screen)
                             break;
                     }
                     break;
+                   
             }
         }
         draw_map(map, screen);
@@ -72,8 +65,8 @@ void game(SDL_Surface *screen)
             playing = false;
         } 
         SDL_Flip(screen);
+         
     }
     SDL_Delay(500);
-    
     free_map(map);
 }

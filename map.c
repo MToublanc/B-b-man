@@ -66,7 +66,7 @@ void draw_map(int **map, SDL_Surface *screen)
     int i, j;
     SDL_Rect position;
     SDL_Surface *explodable_block = NULL, *empty = NULL, *solid_block = NULL, *flames = NULL;
-   
+
     explodable_block = IMG_Load("assets/sprites/explodable-block.png");
     empty = IMG_Load("assets/sprites/empty.png");
     solid_block = IMG_Load("assets/sprites/solid-block.png");
@@ -97,6 +97,7 @@ void draw_map(int **map, SDL_Surface *screen)
         }
     }
 }
+
 void free_map(int **map)
 {
     int i = 0;
