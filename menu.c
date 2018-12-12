@@ -22,7 +22,6 @@ void menu()
         printf("%s", Mix_GetError());
     }
     Mix_AllocateChannels(32);
-    Mix_Chunk *start = NULL;
     Mix_Music *music;
     Mix_Chunk *start_sound = NULL;
     start_sound = Mix_LoadWAV("assets/son/start.wav");
