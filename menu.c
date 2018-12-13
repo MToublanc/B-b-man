@@ -1,11 +1,14 @@
 #include "constants.h"
 #include "game.h"
+#include "socket.h"
+#include <unistd.h>
 
 void menu()
 {
     SDL_Surface *screen = NULL, *menu = NULL;
     SDL_Rect positionMenu;
     SDL_Event event;
+    SDL_Thread *thread;
 
     int playing = 1;
 
@@ -17,6 +20,7 @@ void menu()
     menu = IMG_Load("assets/images/menu.png");
     positionMenu.x = 0;
     positionMenu.y = 0;
+
 
     while (playing)
     {
@@ -33,10 +37,12 @@ void menu()
                         playing = 0;
                         break;
                     case SDLK_j: // Join
-                        game(screen);
+                        game(screen, "Guest",2);
                         break;
                     case SDLK_h: // Host
-                        game(screen);
+                        thread = SDL_CreateThread(server_app, (void *)NULL);
+                        sleep(1);
+                        game(screen, "Host", 1);
                         break;
                     case SDLK_q: //Quit
                         playing = 0;
