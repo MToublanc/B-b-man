@@ -1,6 +1,7 @@
 #ifndef _BOMB_H
 #define _BOMB_H
 
+#include "constants.h"
 typedef struct s_character t_character;
 
 typedef struct          s_bomb {

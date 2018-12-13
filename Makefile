@@ -4,11 +4,16 @@ CFLAGS := -lSDL -lSDL_image -lSDL_ttf -w -Wall -Wextra -Werror
 
 HDRS :=
 
-SRCS :=	main.c		\
-		game.c		\
-		bomb.c		\
-		character.c	\
-		map.c		\
+SRCS :=	main.c						\
+		game.c						\
+		bomb.c						\
+		character.c					\
+		map.c						\
+		server_side.c				\
+		client_side.c				\
+		connection_server.c			\
+		connection_client.c			\
+		my_string.c					\
 		menu.c
 
 OBJS := $(SRCS:.c=.o)

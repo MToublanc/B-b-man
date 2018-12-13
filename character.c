@@ -1,6 +1,8 @@
 #include "constants.h"
 #include "character.h"
 #include "bomb.h"
+#include "socket.h"
+
 
 t_character* create_character(int x, int y)
 {
@@ -60,6 +62,44 @@ void remove_character_by_index(t_character_node **head, int n) {
     current->next = node_to_remove->next;
     free(node_to_remove);
 }
+
+
+
+void draw_characters_on_screenTCP(SDL_Surface *screen, t_character_node **character_list, int **map, t_game *game, int test)
+{
+    int i = 0;
+    t_character_node *current = *character_list;
+
+    while (current != NULL)
+    {
+
+       
+        current->character->x =  game->player_infos[i].x_pos;
+        current->character->y =  game->player_infos[i].y_pos;
+
+        current->character->current_direction =  game->player_infos[i].current_dir;
+        
+        current->character->surface = &game->player_infos[i].surface;
+        
+    
+        current->character->screen_position.x = game->player_infos[i].screen_pos.x;
+        current->character->screen_position.y = game->player_infos[i].screen_pos.y;
+        current->character->screen_position.w = game->player_infos[i].screen_pos.w;
+        current->character->screen_position.h = game->player_infos[i].screen_pos.h;
+
+        current = current->next;
+        i++;
+    }
+     
+    draw_characters_on_screen(screen, character_list, map);
+
+}
+
+
+
+
+
+
 
 void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character_list, int **map)
 {
@@ -132,4 +172,51 @@ void moveCharacter(int **map, t_character *character, t_bomb_node *bomb_list, in
             character->screen_position.x = character->x * BLOCK_SIZE;
             break;
     }
+}
+
+void moveCharacterTCP(int **map, t_player_infos *character, t_bomb_node *bomb_list, int direction)
+{
+    switch(direction)
+    {
+        case UP:
+            character->current_dir = UP;
+            if ((character->y_pos - 1 < 0) || (map[character->y_pos - 1][character->x_pos] != EMPTY))
+                break;
+            else if (is_bomb_at_position(bomb_list, character->x_pos, character->y_pos - 1))
+                break;
+            character->y_pos--;
+            character->screen_pos.y = character->y_pos * BLOCK_SIZE - BLOCK_SIZE;
+            break;
+
+        case DOWN:
+            character->current_dir = DOWN;
+            if ((character->y_pos + 1 >= NB_BLOCK_HEIGHT) || (map[character->y_pos + 1][character->x_pos] != EMPTY))
+                break;
+            else if (is_bomb_at_position(bomb_list, character->x_pos, character->y_pos + 1))
+                break;
+            character->y_pos++;
+            character->screen_pos.y = character->y_pos * BLOCK_SIZE - BLOCK_SIZE;
+            break;
+
+        case LEFT:
+            character->current_dir = LEFT;
+            if ((character->x_pos - 1 < 0) || (map[character->y_pos][character->x_pos - 1] != EMPTY))
+                break;
+            else if (is_bomb_at_position(bomb_list, character->x_pos - 1, character->y_pos))
+                break;
+            character->x_pos--;
+            character->screen_pos.x = character->x_pos * BLOCK_SIZE;
+            break;
+
+        case RIGHT:
+            character->current_dir = RIGHT;
+            if ((character->x_pos + 1 >= NB_BLOCK_WIDTH) || (map[character->y_pos][character->x_pos + 1] != EMPTY))
+                break;
+            else if (is_bomb_at_position(bomb_list, character->x_pos + 1, character->y_pos))
+                break;
+            character->x_pos++;
+            character->screen_pos.x = character->x_pos * BLOCK_SIZE;
+            break;
+    }
+    printf("MOVETCP");
 }
