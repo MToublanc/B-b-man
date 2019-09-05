@@ -13,7 +13,20 @@ void menu()
 
     screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     SDL_WM_SetCaption("Bomberman", NULL);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
+    screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+    SDL_WM_SetCaption("Bomberman", NULL);
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1)
+    {
+        printf("%s", Mix_GetError());
+    }
+    Mix_AllocateChannels(32);
+    Mix_Music *music;
+    Mix_Chunk *start_sound = NULL;
+    start_sound = Mix_LoadWAV("assets/son/start.wav");
+    music = Mix_LoadMUS("assets/son/game.mp3");
+    Mix_PlayMusic(music, -1);
     menu = IMG_Load("assets/images/menu.png");
     positionMenu.x = 0;
     positionMenu.y = 0;
@@ -33,6 +46,7 @@ void menu()
                         playing = 0;
                         break;
                     case SDLK_j: // Join
+                        Mix_PlayChannel(0, start_sound, 0);
                         game(screen);
                         break;
                     case SDLK_h: // Host
@@ -48,7 +62,10 @@ void menu()
         SDL_BlitSurface(menu, NULL, screen, &positionMenu);
         SDL_Flip(screen);
     }
+    Mix_FreeChunk(start_sound);
+    Mix_FreeMusic(music);
     SDL_FreeSurface(menu);
     SDL_FreeSurface(screen);
+    Mix_CloseAudio();
     SDL_Quit();
 }

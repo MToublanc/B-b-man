@@ -11,7 +11,10 @@ void create_thread_args(int **map, t_bomb *bomb, t_args *args)
 t_bomb* create_bomb(int x, int y)
 {
 	t_bomb *bomb = malloc(sizeof(*bomb));
-
+    Mix_Chunk *drop = NULL;
+   
+    drop = Mix_LoadWAV( "assets/son/drop_bomb.wav" );
+    Mix_PlayChannel(1, drop, 0);
 	if (!bomb)
 		error("Bomb create error");
 
@@ -23,6 +26,7 @@ t_bomb* create_bomb(int x, int y)
     bomb->surface = IMG_Load("assets/sprites/bomb.png");
 
 	return bomb;
+    Mix_FreeChunk(drop);
 }
 
 void add_bomb_to_list(t_bomb_node **bomb_list, int x, int y)
@@ -71,7 +75,8 @@ int draw_explosion_on_screen(t_args *args)
 {
     int i = 0, j = 0;
     unsigned int currentTime = 0, prevTime = SDL_GetTicks();
-
+    Mix_Chunk *explosion = NULL;
+    explosion = Mix_LoadWAV( "assets/son/explosion_bomb.wav" );
     set_sprites_for_explosion(args, FLAMES);
 
     while (true)
@@ -80,7 +85,9 @@ int draw_explosion_on_screen(t_args *args)
         if ((currentTime - prevTime) > 500) {
             set_sprites_for_explosion(args, EMPTY);
             free(args);
+            Mix_PlayChannel(-1, explosion, 0);
             return 1;
+            Mix_FreeChunk(explosion);
         }
     }
 

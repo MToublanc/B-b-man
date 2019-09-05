@@ -1,6 +1,6 @@
 CC := gcc
 
-CFLAGS := -lSDL -lSDL_image -lSDL_ttf -w -Wall -Wextra -Werror
+CFLAGS := -lSDL -lSDL_image -lSDL_ttf -lSDL_mixer -w -Wall -Wextra -Werror
 
 HDRS :=
 

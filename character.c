@@ -13,8 +13,8 @@ t_character* create_character(int x, int y)
     character->y = y;
     character->current_direction = DOWN;
     character->life = 1;
-	character->screen_position.x = character->x * BLOCK_SIZE;
-	character->screen_position.y = character->y * BLOCK_SIZE - BLOCK_SIZE;
+	  character->screen_position.x = character->x * BLOCK_SIZE;
+	  character->screen_position.y = character->y * BLOCK_SIZE - BLOCK_SIZE;
     character->surface = malloc(sizeof(SDL_Surface*) * 4);
     character->surface[DOWN] = IMG_Load("assets/sprites/bman-front.png");
     character->surface[LEFT] = IMG_Load("assets/sprites/bman-left.png");
@@ -65,7 +65,8 @@ void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character
 {
     int i = 0;
     t_character_node *current = *character_list;
-
+    Mix_Chunk *game_over = NULL;
+    game_over = Mix_LoadWAV("assets/son/game_over.wav");
     while (current != NULL)
     {
         if (is_character_in_flames(current->character, map))
@@ -81,6 +82,7 @@ void draw_characters_on_screen(SDL_Surface *screen, t_character_node **character
             );
 
         } else {
+            Mix_PlayChannel(-1, game_over, 0);
             remove_character_by_index(character_list, i);
         }
         current = current->next;
