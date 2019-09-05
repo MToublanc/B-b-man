@@ -16,6 +16,7 @@ void game(SDL_Surface *screen)
     Mix_Chunk *game_over = NULL;
     game_over = Mix_LoadWAV("assets/son/game_over.wav");
     add_character_to_list(&character_list, 4, 1);
+ 
     if (!map)
         exit(EXIT_FAILURE);
 

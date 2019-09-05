@@ -13,8 +13,8 @@ t_character* create_character(int x, int y)
     character->y = y;
     character->current_direction = DOWN;
     character->life = 1;
-	character->screen_position.x = character->x * BLOCK_SIZE;
-	character->screen_position.y = character->y * BLOCK_SIZE - BLOCK_SIZE;
+	  character->screen_position.x = character->x * BLOCK_SIZE;
+	  character->screen_position.y = character->y * BLOCK_SIZE - BLOCK_SIZE;
     character->surface = malloc(sizeof(SDL_Surface*) * 4);
     character->surface[DOWN] = IMG_Load("assets/sprites/bman-front.png");
     character->surface[LEFT] = IMG_Load("assets/sprites/bman-left.png");
@@ -40,7 +40,6 @@ bool is_character_in_flames(t_character *character, int **map)
         return true;
         
     return false;
-
 }
 
 void remove_character_by_index(t_character_node **head, int n) {
@@ -52,7 +51,6 @@ void remove_character_by_index(t_character_node **head, int n) {
         free(*head);
         *head = NULL;
         return NULL;
-         
     }
 
     for (i = 0; i < n - 1; i++)
